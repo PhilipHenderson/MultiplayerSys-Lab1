@@ -99,26 +99,27 @@ static public class AssignmentPart1
         // Clears Characters for Reset
         GameContent.partyCharacters.Clear();
 
-        // right now,
-        // this code just adds default party members on Load,
-        // not the saved characters
+        using (StreamReader sr = new StreamReader("Assets/SavedChars/SavedChars.txt"))
+        {
+            string classId;
+            string health;
+            string mana;
+            string strength;
+            string agility;
+            string wisdom;
 
-        // 1. You need to Save the Party Members - DONE
-        // 2. Load the saved members - DOING
-
-        // Default Party Members
-        PartyCharacter pc = new PartyCharacter(1, 10, 10, 10, 10, 10);
-        GameContent.partyCharacters.AddLast(pc);
-        pc = new PartyCharacter(2, 11, 11, 11, 11, 11);
-        GameContent.partyCharacters.AddLast(pc);
-        pc = new PartyCharacter(3, 12, 12, 12, 12, 12);
-        GameContent.partyCharacters.AddLast(pc);
-
+            while ((classId = sr.ReadLine()) != null && (health = sr.ReadLine()) != null 
+               && (mana = sr.ReadLine()) != null && (strength = sr.ReadLine()) != null
+               && (agility = sr.ReadLine()) != null && (wisdom = sr.ReadLine()) != null)
+            {
+                Debug.Log(classId);
+                PartyCharacter pc = new PartyCharacter(int.Parse(classId), int.Parse(health), int.Parse(mana), int.Parse(strength), int.Parse(agility), int.Parse(wisdom));
+                GameContent.partyCharacters.AddLast(pc);
+            }
+        }
         GameContent.RefreshUI();
     }
-
 }
-
 
 #endregion
 
