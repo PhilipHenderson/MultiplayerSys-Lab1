@@ -89,6 +89,10 @@ static public class AssignmentPart1
                     sw.WriteLine(pc1.strength);
                     sw.WriteLine(pc1.agility);
                     sw.WriteLine(pc1.wisdom);
+
+                    // Convert the equipment LinkedList<int> to a comma-separated string
+                    string equipmentString = string.Join(",", pc1.equipment);
+                    sw.WriteLine(equipmentString);
                 }
             }
         }
@@ -101,24 +105,55 @@ static public class AssignmentPart1
 
         using (StreamReader sr = new StreamReader("Assets/SavedChars/SavedChars.txt"))
         {
-            string classId;
-            string health;
-            string mana;
-            string strength;
-            string agility;
-            string wisdom;
-
-            while ((classId = sr.ReadLine()) != null && (health = sr.ReadLine()) != null 
-               && (mana = sr.ReadLine()) != null && (strength = sr.ReadLine()) != null
-               && (agility = sr.ReadLine()) != null && (wisdom = sr.ReadLine()) != null)
+            while (!sr.EndOfStream)
             {
-                Debug.Log(classId);
-                PartyCharacter pc = new PartyCharacter(int.Parse(classId), int.Parse(health), int.Parse(mana), int.Parse(strength), int.Parse(agility), int.Parse(wisdom));
-                GameContent.partyCharacters.AddLast(pc);
+                string classId = sr.ReadLine();
+                string health = sr.ReadLine();
+                string mana = sr.ReadLine();
+                string strength = sr.ReadLine();
+                string agility = sr.ReadLine();
+                string wisdom = sr.ReadLine();
+                string equipmentLine = sr.ReadLine();
+
+                if (classId != null && health != null && mana != null && strength != null && agility != null && wisdom != null && equipmentLine != null) 
+                                                                                       // AAAAAH I FORGOT TO ADD THIS ONE LITTLE THING ^^^^ AND IT TOOK FOREVER TO FIIIND :D
+                {
+                    Debug.Log(classId);
+
+                    string[] equipmentValues = equipmentLine.Split(',');
+                    if (equipmentValues.Length >= 3)
+                    {
+                        int equipment1 = int.Parse(equipmentValues[0]);
+                        int equipment2 = int.Parse(equipmentValues[1]);
+                        int equipment3 = int.Parse(equipmentValues[2]);
+
+                        PartyCharacter pc = new PartyCharacter(
+                            int.Parse(classId),
+                            int.Parse(health),
+                            int.Parse(mana),
+                            int.Parse(strength),
+                            int.Parse(agility),
+                            int.Parse(wisdom)
+                        );
+
+                        pc.equipment.AddLast(equipment1);
+                        pc.equipment.AddLast(equipment2);
+                        pc.equipment.AddLast(equipment3);
+
+                        GameContent.partyCharacters.AddLast(pc);
+                    }
+                    else
+                    {
+                        Debug.LogError("Failed to parse equipment data.");
+                    }
+                }
             }
         }
+
         GameContent.RefreshUI();
     }
+
+
 }
 
 #endregion
