@@ -36,6 +36,7 @@ static public class GameContent
 
     static public class EquipmentID
     {
+        public const int Empty = 0;
         public const int BigSword = 1;
         public const int ShortSword = 2;
         public const int Dagger = 3;
@@ -61,6 +62,7 @@ static public class GameContent
         {
             lookUp = new Dictionary<int, string>();
 
+            lookUp.Add(Empty, " ");
             lookUp.Add(BigSword, "Big Sword");
             lookUp.Add(ShortSword, "Short Sword");
             lookUp.Add(Dagger, "Dagger");

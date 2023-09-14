@@ -73,85 +73,148 @@ public partial class PartyCharacter
 
 static public class AssignmentPart1
 {
+
+    // My Code Saving and Loading Working
     static public void SavePartyButtonPressed()
     {
-        foreach (PartyCharacter pc in GameContent.partyCharacters)
+        using (StreamWriter sw = new StreamWriter("Assets/Scripts/SavedChars.txt"))
         {
-            Debug.Log("PC class id == " + pc.classID);
-
-            using (StreamWriter sw = new StreamWriter("Assets/SavedChars/SavedChars.txt"))
+            foreach (PartyCharacter pc in GameContent.partyCharacters)
             {
-                foreach (PartyCharacter pc1 in GameContent.partyCharacters)
-                {
-                    sw.WriteLine(pc1.classID);
-                    sw.WriteLine(pc1.health);
-                    sw.WriteLine(pc1.mana);
-                    sw.WriteLine(pc1.strength);
-                    sw.WriteLine(pc1.agility);
-                    sw.WriteLine(pc1.wisdom);
+                // Save character stats
+                string statsLine = "0/" + pc.classID + "," + pc.health + "," + pc.mana + "," + pc.strength + "," + pc.agility + "," + pc.wisdom;
+                sw.WriteLine(statsLine);
 
-                    // Convert the equipment LinkedList<int> to a comma-separated string
-                    string equipmentString = string.Join(",", pc1.equipment);
-                    sw.WriteLine(equipmentString);
-                }
+                // Save equipment
+                string equipmentString = "1/" + string.Join(",", pc.equipment);
+                sw.WriteLine(equipmentString);
             }
         }
     }
+
 
     static public void LoadPartyButtonPressed()
     {
         // Clears Characters for Reset
         GameContent.partyCharacters.Clear();
 
-        using (StreamReader sr = new StreamReader("Assets/SavedChars/SavedChars.txt"))
+        using (StreamReader sr = new StreamReader("Assets/Scripts/SavedChars.txt"))
         {
+            PartyCharacter lastCharacter = null;
+
             while (!sr.EndOfStream)
             {
-                string classId = sr.ReadLine();
-                string health = sr.ReadLine();
-                string mana = sr.ReadLine();
-                string strength = sr.ReadLine();
-                string agility = sr.ReadLine();
-                string wisdom = sr.ReadLine();
-                string equipmentLine = sr.ReadLine();
+                string line = sr.ReadLine();
 
-                if (classId != null && health != null && mana != null && strength != null && agility != null && wisdom != null && equipmentLine != null) 
-                                                                                       // AAAAAH I FORGOT TO ADD THIS ONE LITTLE THING ^^^^ AND IT TOOK FOREVER TO FIIIND :D
+                if (line != null)
                 {
-                    Debug.Log(classId);
-
-                    string[] equipmentValues = equipmentLine.Split(',');
-                    if (equipmentValues.Length >= 3)
+                    string[] parts = line.Split('/');
+                    if (parts.Length == 2)
                     {
-                        int equipment1 = int.Parse(equipmentValues[0]);
-                        int equipment2 = int.Parse(equipmentValues[1]);
-                        int equipment3 = int.Parse(equipmentValues[2]);
+                        string type = parts[0];
+                        string data = parts[1];
 
-                        PartyCharacter pc = new PartyCharacter(
-                            int.Parse(classId),
-                            int.Parse(health),
-                            int.Parse(mana),
-                            int.Parse(strength),
-                            int.Parse(agility),
-                            int.Parse(wisdom)
-                        );
+                        if (type == "0")
+                        {
+                            // Character stats
+                            string[] stat = data.Split(',');
+                            if (stat.Length == 6)
+                            {
+                                lastCharacter = new PartyCharacter(
+                                    int.Parse(stat[0]), int.Parse(stat[1]), int.Parse(stat[2]),
+                                    int.Parse(stat[3]), int.Parse(stat[4]), int.Parse(stat[5])
+                                );
+                                GameContent.partyCharacters.AddLast(lastCharacter);
+                            }
+                            else
+                            {
+                                Debug.Log("invalid character stat data: " + data);
+                            }
+                        }
+                        else if (type == "1")
+                        {
+                            // Equipment
+                            if (lastCharacter != null)
+                            {
+                                string[] equipmentValues = data.Split(',');
+                                foreach (var sub in equipmentValues)
+                                {
+                                    lastCharacter.equipment.AddLast(int.Parse(sub));
+                                }
+                            }
+                            else
+                            {
+                                Debug.Log("equipment data befor stat inpout.");
+                            }
+                        }
 
-                        pc.equipment.AddLast(equipment1);
-                        pc.equipment.AddLast(equipment2);
-                        pc.equipment.AddLast(equipment3);
-
-                        GameContent.partyCharacters.AddLast(pc);
+                        else
+                        {
+                            Debug.Log("invalid data type: " + type);
+                        }
                     }
                     else
                     {
-                        Debug.LogError("Failed to parse equipment data.");
+                        Debug.Log("invalid line format: " + line);
                     }
                 }
             }
-        }
 
-        GameContent.RefreshUI();
+
+            GameContent.RefreshUI();
+        }
     }
+
+
+
+    // Lukes Code - Saving and Loading Working
+    //static public void SavePartyButtonPressed()
+    //{
+    //    using (StreamWriter sw = new StreamWriter("Assets/Scripts/SavedChars.txt"))
+    //    {
+    //        foreach (PartyCharacter pc in GameContent.partyCharacters)
+    //        {
+    //            sw.WriteLine(pc.classID + "," + pc.health + "," + pc.mana + "," + 
+    //                         pc.strength + "," + pc.agility + "," + pc.wisdom);
+
+    //            string equipmentString = string.Join(",", pc.equipment);
+    //            sw.WriteLine(equipmentString);
+    //        }
+    //    }
+    //}
+
+
+
+    //static public void LoadPartyButtonPressed()
+    //{
+    //    GameContent.partyCharacters.Clear();
+
+    //    using (StreamReader sr = new StreamReader("Assets/Scripts/SavedChars.txt"))
+    //    {
+    //        string stats;
+    //        string equipment;
+
+    //        while ((stats = sr.ReadLine()) != null && (equipment = sr.ReadLine()) != null)
+    //        {
+    //            string[] socks = stats.Split(',');
+
+    //            string[] socksers = equipment.Split(',');
+
+    //            PartyCharacter pc = new PartyCharacter
+    //                (int.Parse(socks[0]), int.Parse(socks[1]), int.Parse(socks[2]),
+    //                 int.Parse(socks[3]), int.Parse(socks[4]), int.Parse(socks[5]));
+
+    //            foreach (var sub in socksers)
+    //            {
+    //                pc.equipment.AddLast(int.Parse(sub));
+    //            }
+
+    //            GameContent.partyCharacters.AddLast(pc);
+    //        }
+    //    }
+    //    GameContent.RefreshUI();
+    //}
+
 
 
 }
